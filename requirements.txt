@@ -1,0 +1,6 @@
+tensorflow
+tqdm
+argparse
+librosa
+django
+dynaconf

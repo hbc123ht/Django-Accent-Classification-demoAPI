@@ -1,0 +1,10 @@
+{
+    "categories" : {
+        "female_central" : 0,
+        "male_central" : 1,
+        "female_north" : 2,
+        "male_north" : 3,
+        "female_south" : 4,
+        "male_south" : 5
+    }   
+}
