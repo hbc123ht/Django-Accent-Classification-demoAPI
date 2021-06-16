@@ -24,7 +24,7 @@ class Accent_Identification:
         self.categories = load_categories('ML/core/categories/labels.json')
         
         # # initiate model
-        self.model = Model(input_shape = (128, 45, 1), num_classes = len(self.categories), lr = settings.LR)
+        self.model = Model(input_shape = (128, 30, 1), num_classes = len(self.categories), lr = settings.LR)
 
         #load the weights                
         try:
@@ -44,8 +44,12 @@ class Accent_Identification:
         X = segment_one(X, COL_SIZE = settings.COL_SIZE)
 
         prediction = self.model.predict(X)
-        prediction = np.argmax(np.sum(prediction,axis = 0))
+        prediction = np.argmax(prediction, axis = 1)
+        print(prediction)
+        prediction = np.bincount(prediction)
+        prediction = np.argmax(prediction)
         prediction = [key for key, value in self.categories.items() if value == prediction]
+        print(prediction)
 
         return prediction
             
