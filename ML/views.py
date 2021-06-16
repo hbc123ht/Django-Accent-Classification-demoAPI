@@ -22,6 +22,7 @@ def predict(request):
     uploadedFile.close()
     
     result.result = ML.predict('test.wav')
+    os.remove('test.wav')
 
     return redirect('/')
 
