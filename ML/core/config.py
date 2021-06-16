@@ -1,7 +1,7 @@
 DEBUG = True
 
 # You could get it the length of a segment, 1.5 s by default 
-COL_SIZE = 45 
+COL_SIZE = 30
 
 # Frequency for saving checkpoint
 SAVE_CHECKPOINT_FREQUENCY = 50 
@@ -25,7 +25,7 @@ BATCH_SIZE = 32
 STEPS_PER_EPOCH = 128
 
 #Dir of checkpoint if u use a pretrained model, None by default
-LOAD_CHECKPOINT_DIR = 'ML/core/checkpoint/model.149.h5'
+LOAD_CHECKPOINT_DIR = 'ML/core/checkpoint/model.60.h5'
 
 #Initial learning rate
 LR = 0.05
