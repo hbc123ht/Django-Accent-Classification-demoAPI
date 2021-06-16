@@ -37,7 +37,7 @@ def load_data(path, categories):
                 x.append(os.path.join(path, file))
                 
     return x, y
-    
+
 def to_categorical(y, num_classes = 6):
     '''
     Converts list of languages into a binary class matrix
@@ -108,7 +108,7 @@ def get_input_shape(mfccs, COL_SIZE):
 
     return (rows, columns, 1)
 
-def make_segments(mfccs,labels, COL_SIZE = 13):
+def make_segments(mfccs,labels, COL_SIZE = 45):
     '''
     Makes segments of mfccs and attaches them to the labels
     :param mfccs: list of mfccs
@@ -118,9 +118,12 @@ def make_segments(mfccs,labels, COL_SIZE = 13):
     segments = []
     seg_labels = []
     for mfcc,label in zip(mfccs,labels):
-        for start in range(0, int(mfcc.shape[1] / COL_SIZE)):
-            segments.append(mfcc[:, start * COL_SIZE:(start + 1) * COL_SIZE])
-            seg_labels.append(label)
+        for surplus in range(0, COL_SIZE, 10):
+            for start in range(0, int(mfcc.shape[1] / COL_SIZE) - 1):
+                segments.append(mfcc[:, start * COL_SIZE + surplus : (start + 1) * COL_SIZE + surplus])
+                seg_labels.append(label)
+
+            
         if (int(mfcc.shape[1]) < COL_SIZE):
             begin_duration = random.randint(0, COL_SIZE - mfcc.shape[1])
             end_duration = COL_SIZE - mfcc.shape[1] - begin_duration
@@ -131,16 +134,18 @@ def make_segments(mfccs,labels, COL_SIZE = 13):
 
     return(np.array(segments)[..., np.newaxis], seg_labels)
 
-def segment_one(mfcc, COL_SIZE = 13):
+def segment_one(mfcc, COL_SIZE = 45):
     '''
     Creates segments from on mfcc image. If last segments is not long enough to be length of columns divided by COL_SIZE
     :param mfcc (numpy array): MFCC array
     :return (numpy array): Segmented MFCC array
     '''
     segments = []
-    seg_labels = []
-    for start in range(0, int(mfcc.shape[1] / COL_SIZE)):
-            segments.append(mfcc[:, start * COL_SIZE:(start + 1) * COL_SIZE])
+    
+    for surplus in range(0, COL_SIZE, 10):
+        for start in range(0, int(mfcc.shape[1] / COL_SIZE) - 1):
+            segments.append(mfcc[:, start * COL_SIZE + surplus : (start + 1) * COL_SIZE + surplus])
+
     if (int(mfcc.shape[1]) < COL_SIZE):
         begin_duration = random.randint(0, COL_SIZE - mfcc.shape[1])
         end_duration = COL_SIZE - mfcc.shape[1] - begin_duration
