@@ -72,11 +72,29 @@
                 }
 
                 var csrftoken = getCookie('csrftoken');
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'upload_wav/', true);
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                xhr.setRequestHeader("MyCustomHeader", "Put anything you need in here, like an ID");
-                xhr.send(blob);
+                // var xhr = new XMLHttpRequest();
+                // xhr.open('POST', 'upload_wav/', true);
+                // xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                // xhr.setRequestHeader("MyCustomHeader", "Put anything you need in here, like an ID");
+                // xhr.send(blob);
+                
+                var form = new FormData($('form').get(0));
+                form.append('audio', blob);
+                $.ajax({
+                    headers : {
+                        "X-CSRFToken" : getCookie('csrftoken'),
+                    },
+                    url: '/upload_wav/',
+                    type: 'POST',
+                    data: form,
+                    processData: false,
+                    contentType: false,
+                    success: function (result) {
+                        let tab = '<pi>' + result['result'] + '</p>';
+                        document.getElementById("result").innerHTML = tab;
+                        console.log(result);
+                    }
+                });
         };
 
         var timeInterval = 10000;
