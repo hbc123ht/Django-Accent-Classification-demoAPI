@@ -123,28 +123,6 @@ input[type=checkbox] {
     position: absolute;
     top: -100px;
 }
-
-aside {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-transform: translateX(100%);
-transition: 0.3s all ease-out;
-background-color: #efefef;
-padding: 1rem;
-}
-
-aside p {
-font-size: 1.2rem;
-margin: 0.5rem 0;
-}
-
-aside a {
-color: #666;
-}
-
 /* Toggled State of information box */
 input[type=checkbox]:checked ~ aside {
 transform: translateX(0);
@@ -165,4 +143,51 @@ cursor: pointer;
     max-width: 1000px;
     margin: 0 auto;
 }
+}
+.lds-hourglass {
+    margin: 0;
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.lds-hourglass:after {
+  content: " ";
+  display: block;
+  border-radius: 50%;
+  width: 0;
+  height: 0;
+  margin: 8px;
+  box-sizing: border-box;
+  border: 32px solid rgb(255, 0, 0);
+  border-color: rgb(233, 35, 35) transparent rgb(255, 0, 0) transparent;
+  animation: lds-hourglass 1.2s infinite;
+}
+.lds-hourglass.hidden{
+    display: none;
+}
+@keyframes lds-hourglass {
+  0% {
+    transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  50% {
+    transform: rotate(900deg);
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  100% {
+    transform: rotate(1800deg);
+  }
+}
+.result{
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.text{
+    text-align: center;
 }
