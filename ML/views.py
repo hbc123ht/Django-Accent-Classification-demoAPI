@@ -1,10 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import wave
 import os
 from ML import Accent_Identification
-from ML.models import Result
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 
