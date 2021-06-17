@@ -89,11 +89,19 @@
                     data: form,
                     processData: false,
                     contentType: false,
+                    beforeSend: function () { // Before we send the request, remove the .hidden class from the spinner and default to inline-block.
+                        document.getElementById("result").innerHTML = "";
+                        $('#loader').removeClass('hidden')
+
+                    },
                     success: function (result) {
-                        let tab = '<pi>' + result['result'] + '</p>';
+                        let tab = '<h1 id="text">' + result['result'] + '</h1>';
                         document.getElementById("result").innerHTML = tab;
                         console.log(result);
-                    }
+                    },
+                    complete: function () { // Set our complete callback, adding the .hidden class and hiding the spinner.
+                        $('#loader').addClass('hidden')
+                    },
                 });
         };
 
