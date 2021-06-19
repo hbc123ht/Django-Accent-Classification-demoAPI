@@ -1,2 +1,1 @@
-from .core.predict import Accent_Identification
-from . import core
+from .utils import (get_wav, to_mfcc, normalize_mfcc, segment_one, remove_silence)
