@@ -31,7 +31,7 @@ def predict(request):
     X = segment_one(X, COL_SIZE = settings.COL_SIZE)
 
 
-    prediction = None
+    prediction = 6
     try:
         prediction = Predictor.model.predict(X)
         prediction = np.argmax(prediction, axis = 1)
