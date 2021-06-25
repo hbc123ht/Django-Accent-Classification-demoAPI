@@ -8,7 +8,7 @@ from keras.utils.np_utils import to_categorical
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
-
+from django.conf import settings
 def load_categories(path):
     '''
     Get the categories from json file
@@ -96,7 +96,7 @@ def normalize_mfcc(mfcc):
     mms = MinMaxScaler()
     return(mms.fit_transform(np.abs(mfcc)))
 
-def get_input_shape(mfccs, COL_SIZE):
+def get_input_shape(mfccs, COL_SIZE = settings.COL_SIZE):
     """
     Get the input shape of data
     :param mfccs: list of mfccs
@@ -108,7 +108,7 @@ def get_input_shape(mfccs, COL_SIZE):
 
     return (rows, columns, 1)
 
-def make_segments(mfccs,labels, COL_SIZE = 45):
+def make_segments(mfccs,labels, COL_SIZE = settings.COL_SIZE):
     '''
     Makes segments of mfccs and attaches them to the labels
     :param mfccs: list of mfccs
@@ -134,7 +134,7 @@ def make_segments(mfccs,labels, COL_SIZE = 45):
 
     return(np.array(segments)[..., np.newaxis], seg_labels)
 
-def segment_one(mfcc, COL_SIZE = 45):
+def segment_one(mfcc, COL_SIZE = settings.COL_SIZE):
     '''
     Creates segments from on mfcc image. If last segments is not long enough to be length of columns divided by COL_SIZE
     :param mfcc (numpy array): MFCC array
@@ -154,14 +154,3 @@ def segment_one(mfcc, COL_SIZE = 45):
         segments.append(mfcc_)
 
     return np.array(segments)[..., np.newaxis]
-
-def create_segmented_mfccs(X_train):
-    '''
-    Creates segmented MFCCs from X_train
-    :param X_train: list of MFCCs
-    :return: segmented mfccs
-    '''
-    segmented_mfccs = []
-    for mfcc in X_train:
-        segmented_mfccs.append(segment_one(mfcc))
-    return(segmented_mfccs)

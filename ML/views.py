@@ -28,7 +28,7 @@ def predict(request):
 
     X = normalize_mfcc(X)
 
-    X = segment_one(X, COL_SIZE = settings.COL_SIZE)
+    X = segment_one(X)
 
 
     prediction = 6
