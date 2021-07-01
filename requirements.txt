@@ -4,3 +4,4 @@ argparse
 librosa
 django
 dynaconf
+p_tqdm
