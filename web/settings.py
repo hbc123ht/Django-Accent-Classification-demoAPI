@@ -126,6 +126,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MODEL_PATH = 'model/model.90.h5'
+MODEL_PATH = 'model'
 
-COL_SIZE = 45
+COL_SIZE = 20000
+
+OVERLAP_SIZE = 1000

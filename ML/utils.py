@@ -8,7 +8,7 @@ from keras.utils.np_utils import to_categorical
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
-from django.conf import settings
+
 def load_categories(path):
     '''
     Get the categories from json file
@@ -70,7 +70,15 @@ def to_mfcc(wav, RATE = 36000, N_MFCC = 300):
     '''
     return(librosa.feature.mfcc(y=wav, sr=RATE, n_mfcc=N_MFCC))
 
-def remove_silence(wav, thresh=0.04, chunk=5000):
+def to_mel(wav, RATE = 36000, N_MELS = 300):
+    '''
+    Converts wav file to Mel Frequency Ceptral Coefficients
+    :param wav (numpy array): Wav form
+    :return (2d numpy array: MFCC
+    '''
+    return(librosa.feature.melspectrogram(y=wav, sr=RATE, n_mels=N_MELS))
+
+def remove_silence(wav, thresh=0.01, chunk=5000):
     '''
     Searches wav form for segments of silence. If wav form values are lower than 'thresh' for 'chunk' samples, the values will be removed
     :param wav (np array): Wav array to be filtered
@@ -96,7 +104,15 @@ def normalize_mfcc(mfcc):
     mms = MinMaxScaler()
     return(mms.fit_transform(np.abs(mfcc)))
 
-def get_input_shape(mfccs, COL_SIZE = settings.COL_SIZE):
+def add_dim(mfcc):
+    '''
+    Add a dimension for training
+    :param mfcc:
+    :return:
+    '''
+    return np.array(mfcc)[..., np.newaxis]
+
+def get_input_shape(mfccs):
     """
     Get the input shape of data
     :param mfccs: list of mfccs
@@ -104,11 +120,11 @@ def get_input_shape(mfccs, COL_SIZE = settings.COL_SIZE):
     :return (tuple): input shape
     """
     rows = np.array(mfccs[0]).shape[0]
-    columns = COL_SIZE
+    columns = np.array(mfccs[0]).shape[1]
 
-    return (rows, columns, 1)
+    return (None, rows, columns, 1)
 
-def make_segments(mfccs,labels, COL_SIZE = settings.COL_SIZE):
+def make_segments(mfccs,labels, COL_SIZE = 45, OVERLAP_SIZE = 15):
     '''
     Makes segments of mfccs and attaches them to the labels
     :param mfccs: list of mfccs
@@ -118,23 +134,47 @@ def make_segments(mfccs,labels, COL_SIZE = settings.COL_SIZE):
     segments = []
     seg_labels = []
     for mfcc,label in zip(mfccs,labels):
-        for surplus in range(0, COL_SIZE, 10):
-            for start in range(0, int(mfcc.shape[1] / COL_SIZE) - 1):
-                segments.append(mfcc[:, start * COL_SIZE + surplus : (start + 1) * COL_SIZE + surplus])
+        for surplus in range(0, COL_SIZE, OVERLAP_SIZE):
+            for start in range(0, int(mfcc.shape[0] / COL_SIZE) - 1):
+                segments.append(mfcc[start * COL_SIZE + surplus : (start + 1) * COL_SIZE + surplus])
                 seg_labels.append(label)
 
             
-        if (int(mfcc.shape[1]) < COL_SIZE):
-            begin_duration = random.randint(0, COL_SIZE - mfcc.shape[1])
-            end_duration = COL_SIZE - mfcc.shape[1] - begin_duration
-            mfcc_ = np.concatenate((np.zeros((mfcc.shape[0], begin_duration)), mfcc), axis = 1)
-            mfcc_ = np.concatenate((mfcc_,np.zeros((mfcc.shape[0], end_duration))), axis = 1)
+        if (int(mfcc.shape[0]) < COL_SIZE):
+            begin_duration = random.randint(0, COL_SIZE - mfcc.shape[0])
+            end_duration = COL_SIZE - mfcc.shape[0] - begin_duration
+            mfcc_ = np.concatenate((np.zeros((begin_duration)), mfcc))
+            mfcc_ = np.concatenate((mfcc_,np.zeros((end_duration))))
             segments.append(mfcc_)
             seg_labels.append(label)
+            
+    return(np.array(segments), seg_labels)
 
-    return(np.array(segments)[..., np.newaxis], seg_labels)
+def segment_one(mfcc, label, COL_SIZE = 45, OVERLAP_SIZE = 15):
+    '''
+    Creates segments from on mfcc image. If last segments is not long enough to be length of columns divided by COL_SIZE
+    :param mfcc (numpy array): MFCC array
+    :return (numpy array): Segmented MFCC array
+    '''
+    segments = []
+    seg_labels = []
+    
+    for surplus in range(0, COL_SIZE, OVERLAP_SIZE):
+        for start in range(0, int(mfcc.shape[0] / COL_SIZE) - 1):
+            segments.append(mfcc[start * COL_SIZE + surplus : (start + 1) * COL_SIZE + surplus])
+            seg_labels.append(label)
 
-def segment_one(mfcc, COL_SIZE = settings.COL_SIZE):
+    if (int(mfcc.shape[0]) < COL_SIZE):
+        begin_duration = random.randint(0, COL_SIZE - mfcc.shape[0])
+        end_duration = COL_SIZE - mfcc.shape[0] - begin_duration
+        mfcc_ = np.concatenate((np.zeros((begin_duration)), mfcc))
+        mfcc_ = np.concatenate((mfcc_,np.zeros((end_duration))))
+        segments.append(mfcc_)
+        seg_labels.append(label)
+
+    return(np.array(segments), np.array(seg_labels))
+
+def make_segment(mfcc, COL_SIZE = 45, OVERLAP_SIZE = 1):
     '''
     Creates segments from on mfcc image. If last segments is not long enough to be length of columns divided by COL_SIZE
     :param mfcc (numpy array): MFCC array
@@ -142,15 +182,15 @@ def segment_one(mfcc, COL_SIZE = settings.COL_SIZE):
     '''
     segments = []
     
-    for surplus in range(0, COL_SIZE, 10):
-        for start in range(0, int(mfcc.shape[1] / COL_SIZE) - 1):
-            segments.append(mfcc[:, start * COL_SIZE + surplus : (start + 1) * COL_SIZE + surplus])
+    for surplus in range(0, COL_SIZE, OVERLAP_SIZE):
+        for start in range(0, int(mfcc.shape[0] / COL_SIZE) - 1):
+            segments.append(mfcc[start * COL_SIZE + surplus : (start + 1) * COL_SIZE + surplus])
 
-    if (int(mfcc.shape[1]) < COL_SIZE):
-        begin_duration = random.randint(0, COL_SIZE - mfcc.shape[1])
-        end_duration = COL_SIZE - mfcc.shape[1] - begin_duration
-        mfcc_ = np.concatenate((np.zeros((mfcc.shape[0], begin_duration)), mfcc), axis = 1)
-        mfcc_ = np.concatenate((mfcc_,np.zeros((mfcc.shape[0], end_duration))), axis = 1)
+    if (int(mfcc.shape[0]) < COL_SIZE):
+        begin_duration = random.randint(0, COL_SIZE - mfcc.shape[0])
+        end_duration = COL_SIZE - mfcc.shape[0] - begin_duration
+        mfcc_ = np.concatenate((np.zeros((begin_duration)), mfcc))
+        mfcc_ = np.concatenate((mfcc_,np.zeros((end_duration))))
         segments.append(mfcc_)
 
-    return np.array(segments)[..., np.newaxis]
+    return(np.array(segments))

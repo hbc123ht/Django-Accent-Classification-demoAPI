@@ -1,1 +1,1 @@
-from .utils import (get_wav, to_mfcc, normalize_mfcc, segment_one, remove_silence)
+from .utils import (get_wav, to_mfcc, normalize_mfcc, segment_one, remove_silence, add_dim, make_segment)

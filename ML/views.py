@@ -6,8 +6,10 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
 from ML.apps import Predictor
-from ML import get_wav, to_mfcc, normalize_mfcc,segment_one, remove_silence
+from ML import get_wav, to_mfcc, normalize_mfcc,segment_one, remove_silence, add_dim, make_segment
 import numpy as np
+from p_tqdm import p_map
+
 
 # Create your views here.
 def index(request):
@@ -24,17 +26,17 @@ def predict(request):
     os.remove('voice.wav')
     X = remove_silence(X)
 
-    X = to_mfcc(X)
-
-    X = normalize_mfcc(X)
-
-    X = segment_one(X)
-
+    X = make_segment(X, COL_SIZE = settings.COL_SIZE, OVERLAP_SIZE = settings.OVERLAP_SIZE)
+    X = p_map(to_mfcc, X)
+    X = p_map(normalize_mfcc,X)
+    X = p_map(add_dim, X)
 
     prediction = 6
+
     try:
-        prediction = Predictor.model.predict(X)
+        prediction = Predictor.model.predict(np.array(X))
         prediction = np.argmax(prediction, axis = 1)
+        print(prediction)
         prediction = np.bincount(prediction)
         prediction = np.argmax(prediction)
     except:
