@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-s=5raa^of#@-0_8(l^ira_rg2gice=*r_wn#f6$hs6vhucx8j='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -130,4 +130,4 @@ MODEL_PATH = 'model'
 
 COL_SIZE = 20000
 
-OVERLAP_SIZE = 1000
+OVERLAP_SIZE = 7000

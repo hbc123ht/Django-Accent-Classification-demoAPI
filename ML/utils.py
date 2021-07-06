@@ -62,7 +62,7 @@ def get_wav(language_num, RATE = 36000):
     y, sr = librosa.load(language_num)
     return (librosa.core.resample(y=y,orig_sr=sr,target_sr=RATE, scale=True))
 
-def to_mfcc(wav, RATE = 36000, N_MFCC = 300):
+def to_mfcc(wav, RATE = 36000, N_MFCC = 50):
     '''
     Converts wav file to Mel Frequency Ceptral Coefficients
     :param wav (numpy array): Wav form
@@ -78,7 +78,7 @@ def to_mel(wav, RATE = 36000, N_MELS = 300):
     '''
     return(librosa.feature.melspectrogram(y=wav, sr=RATE, n_mels=N_MELS))
 
-def remove_silence(wav, thresh=0.01, chunk=5000):
+def remove_silence(wav, thresh=0.02, chunk=5000):
     '''
     Searches wav form for segments of silence. If wav form values are lower than 'thresh' for 'chunk' samples, the values will be removed
     :param wav (np array): Wav array to be filtered

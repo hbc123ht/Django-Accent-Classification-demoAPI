@@ -36,7 +36,6 @@ def predict(request):
     try:
         prediction = Predictor.model.predict(np.array(X))
         prediction = np.argmax(prediction, axis = 1)
-        print(prediction)
         prediction = np.bincount(prediction)
         prediction = np.argmax(prediction)
     except:
